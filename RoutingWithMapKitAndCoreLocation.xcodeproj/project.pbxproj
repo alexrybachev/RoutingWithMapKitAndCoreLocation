@@ -14,6 +14,10 @@
 		282C2A26286B74A500707B08 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 282C2A25286B74A500707B08 /* Assets.xcassets */; };
 		282C2A29286B74A500707B08 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 282C2A27286B74A500707B08 /* LaunchScreen.storyboard */; };
 		282C2A35286B790300707B08 /* DirectionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A34286B790300707B08 /* DirectionsViewController.swift */; };
+		282C2A39286B7E3300707B08 /* UITextField+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A38286B7E3300707B08 /* UITextField+Additions.swift */; };
+		282C2A3B286B7ECB00707B08 /* TimeInterval+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A3A286B7ECB00707B08 /* TimeInterval+Additions.swift */; };
+		282C2A3E286B7F4900707B08 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A3D286B7F4900707B08 /* Route.swift */; };
+		282C2A40286B803C00707B08 /* RouteAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A3F286B803C00707B08 /* RouteAnnotation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +30,10 @@
 		282C2A28286B74A500707B08 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		282C2A2A286B74A500707B08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		282C2A34286B790300707B08 /* DirectionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionsViewController.swift; sourceTree = "<group>"; };
+		282C2A38286B7E3300707B08 /* UITextField+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Additions.swift"; sourceTree = "<group>"; };
+		282C2A3A286B7ECB00707B08 /* TimeInterval+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Additions.swift"; sourceTree = "<group>"; };
+		282C2A3D286B7F4900707B08 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
+		282C2A3F286B803C00707B08 /* RouteAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteAnnotation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +68,9 @@
 			children = (
 				282C2A30286B753B00707B08 /* App */,
 				282C2A31286B754400707B08 /* ViewControllers */,
+				282C2A3C286B7F3D00707B08 /* Model */,
+				282C2A37286B7E1A00707B08 /* Extensions */,
+				282C2A36286B7E0200707B08 /* Helpers */,
 				282C2A32286B754D00707B08 /* Storyboards */,
 				282C2A33286B755500707B08 /* Resources */,
 			);
@@ -100,6 +111,31 @@
 				282C2A25286B74A500707B08 /* Assets.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		282C2A36286B7E0200707B08 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		282C2A37286B7E1A00707B08 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				282C2A38286B7E3300707B08 /* UITextField+Additions.swift */,
+				282C2A3A286B7ECB00707B08 /* TimeInterval+Additions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		282C2A3C286B7F3D00707B08 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				282C2A3D286B7F4900707B08 /* Route.swift */,
+				282C2A3F286B803C00707B08 /* RouteAnnotation.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -175,7 +211,11 @@
 			files = (
 				282C2A35286B790300707B08 /* DirectionsViewController.swift in Sources */,
 				282C2A21286B74A400707B08 /* RouteSelectionViewController.swift in Sources */,
+				282C2A40286B803C00707B08 /* RouteAnnotation.swift in Sources */,
+				282C2A39286B7E3300707B08 /* UITextField+Additions.swift in Sources */,
+				282C2A3B286B7ECB00707B08 /* TimeInterval+Additions.swift in Sources */,
 				282C2A1D286B74A400707B08 /* AppDelegate.swift in Sources */,
+				282C2A3E286B7F4900707B08 /* Route.swift in Sources */,
 				282C2A1F286B74A400707B08 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

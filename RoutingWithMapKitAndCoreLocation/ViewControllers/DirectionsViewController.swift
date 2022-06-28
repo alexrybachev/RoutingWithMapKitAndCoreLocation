@@ -6,9 +6,31 @@
 //
 
 import UIKit
+import MapKit
 
 class DirectionsViewController: UIViewController {
-
+    
+    @IBOutlet weak var mapView: MKMapView!
+    
+    @IBOutlet weak var headerLabel: UILabel!
+    @IBOutlet weak var informationLabel: UILabel!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    private let callIdentifier = "DirectionsCell"
+    
+    private let route: Route
+    
+    init(route: Route) {
+        self.route = route
+        super.init(nibName: "DirectionsViewController", bundle: Bundle.main)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 

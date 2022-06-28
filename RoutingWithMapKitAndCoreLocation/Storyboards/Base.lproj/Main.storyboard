@@ -145,10 +145,10 @@
             </objects>
             <point key="canvasLocation" x="18.840579710144929" y="137.94642857142856"/>
         </scene>
-        <!--View Controller-->
+        <!--Directions View Controller-->
         <scene sceneID="hTn-Lf-19I">
             <objects>
-                <viewController id="vDt-DG-cAX" sceneMemberID="viewController">
+                <viewController id="vDt-DG-cAX" customClass="DirectionsViewController" customModule="RoutingWithMapKitAndCoreLocation" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="uxG-ai-E4i">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -204,6 +204,13 @@
                             <constraint firstItem="hVL-rW-2kj" firstAttribute="top" relation="lessThanOrEqual" secondItem="Ziu-dn-20K" secondAttribute="bottom" constant="12" id="w34-yf-MiP"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="activityIndicator" destination="Iot-RK-QsH" id="ihV-st-fIL"/>
+                        <outlet property="headerLabel" destination="IYr-Xi-FxB" id="RbV-7V-84q"/>
+                        <outlet property="informationLabel" destination="Wxe-Ts-z1u" id="Ka6-nj-3Wy"/>
+                        <outlet property="mapView" destination="LVV-ie-xYp" id="Tpo-aW-SAq"/>
+                        <outlet property="tableView" destination="hVL-rW-2kj" id="oMl-oM-cmV"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="PMM-e6-vpL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

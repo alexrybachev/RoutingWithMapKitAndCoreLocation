@@ -20,7 +20,13 @@ class DirectionsViewController: UIViewController {
     
     private let callIdentifier = "DirectionsCell"
     
+    private var mapRoutes: [MKRoute] = []
+    private var totalTravelTime: TimeInterval = 0
+    private var totalDistance: CLLocationDistance = 0
+    
     private let route: Route
+    
+    // MARK: - Initial
     
     init(route: Route) {
         self.route = route
@@ -31,21 +37,41 @@ class DirectionsViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - View Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        headerLabel.text = route.label
+        tableView.dataSource = self
+        
+        mapView.showAnnotations(route.annotations, animated: false)
     }
     
 
-    /*
-    // MARK: - Navigation
+}
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+// MARK: - UITableViewDataSource
+
+extension DirectionsViewController: UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return mapRoutes.isEmpty ? 0 : mapRoutes.count
     }
-    */
-
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let route = mapRoutes[section]
+        return route.steps.count - 1
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        return UITableViewCell()
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let route =  mapRoutes[section]
+        return route.name
+    }
+    
 }

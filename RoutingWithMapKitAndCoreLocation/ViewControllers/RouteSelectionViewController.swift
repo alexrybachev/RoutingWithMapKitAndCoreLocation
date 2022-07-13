@@ -71,6 +71,24 @@ class RouteSelectionViewController: UIViewController {
         
     }
     
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+        let gestureView = gesture.view
+        let point = gesture.location(in: gestureView)
+        
+        guard
+            let hitView = gestureView?.hitTest(point, with: nil),
+            hitView == gestureView
+        else {
+            return
+        }
+        
+        view.endEditing(true)
+    }
+    
+    @objc private func suggestionTapped(_ gesture: UITapGestureRecognizer) {
+        
+    }
+    
     // TODO: - !!!!
     
     @IBAction private func calculateButtonTapped() {

@@ -19,6 +19,7 @@ class DirectionsViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     private let callIdentifier = "DirectionsCell"
+    private let distanceFormatter = MKDistanceFormatter()
     
     private var mapRoutes: [MKRoute] = []
     private var totalTravelTime: TimeInterval = 0
@@ -48,7 +49,19 @@ class DirectionsViewController: UIViewController {
         mapView.showAnnotations(route.annotations, animated: false)
     }
     
-
+    // MARK: - Helpers
+    
+    private func groupAndRequestDirections() {
+        
+    }
+    
+    private func fetchNextRoute() {
+        
+    }
+    
+    private func updateView(with mapRoute: MKRoute) {
+        
+    }
 }
 
 // MARK: - UITableViewDataSource

@@ -31,7 +31,7 @@ class DirectionsViewController: UIViewController {
     
     init(route: Route) {
         self.route = route
-        super.init(nibName: "DirectionsViewController", bundle: Bundle.main)
+        super.init(nibName: String(describing: DirectionsViewController.self), bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -42,8 +42,11 @@ class DirectionsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        groupAndRequestDirections()
 
         headerLabel.text = route.label
+        
         tableView.dataSource = self
         
         mapView.showAnnotations(route.annotations, animated: false)

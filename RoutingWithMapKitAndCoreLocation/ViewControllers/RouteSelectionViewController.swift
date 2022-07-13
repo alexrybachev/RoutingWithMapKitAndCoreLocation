@@ -11,16 +11,18 @@ import CoreLocation
 
 class RouteSelectionViewController: UIViewController {
     
-    @IBOutlet weak var inputContainerView: UIView!
-    @IBOutlet weak var originTextField: UITextField!
-    @IBOutlet weak var stopTextField: UITextField!
-    @IBOutlet weak var extraTextField: UITextField!
+    @IBOutlet private var inputContainerView: UIView!
+    @IBOutlet private var originTextField: UITextField!
+    @IBOutlet private var stopTextField: UITextField!
+    @IBOutlet private var extraTextField: UITextField!
     
-    @IBOutlet weak var calculateButton: UIButton!
-    @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
+    @IBOutlet private var calculateButton: UIButton!
+    @IBOutlet private var activityIndicatorView: UIActivityIndicatorView!
+    @IBOutlet private var keyboardAvoidingConstraints: NSLayoutConstraint!
     
-    @IBOutlet weak var suggestionContainerView: UIView!
-    @IBOutlet weak var suggestionLabel: UILabel!
+    @IBOutlet private var suggestionLabel: UILabel!
+    @IBOutlet private var suggestionContainerView: UIView!
+    @IBOutlet private var suggestionContainerTopConstraint: NSLayoutConstraint!
     
     private let defaultAnimationDuration: TimeInterval = 0.25
     
@@ -28,9 +30,34 @@ class RouteSelectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        suggestionContainerView.addBorder()
+        inputContainerView.addBorder()
+        calculateButton.stylize()
+        
+        beginObserving()
+        configureGestures()
         configureTextFields()
+        attemptLocationAccess()
+        hideSuggestionView(animated: false)
     }
-
+    
+    // MARK: - Helpers
+    
+    private func configureGestures() {
+        view.addGestureRecognizer(
+            UITapGestureRecognizer(
+                target: self,
+                action: #selector(handleTap)
+            )
+        )
+        suggestionContainerView.addGestureRecognizer(
+            UIGestureRecognizer(
+                target: self,
+                action: #selector(suggestionTapped)
+            )
+        )
+    }
+    
     private func configureTextFields() {
         originTextField.delegate = self
         stopTextField.delegate = self
@@ -53,6 +80,18 @@ class RouteSelectionViewController: UIViewController {
             action: #selector(textFieldDidChange),
             for: .editingChanged
         )
+    }
+    
+    private func attemptLocationAccess() {
+        
+    }
+    
+    private func hideSuggestionView(animated: Bool) {
+        
+    }
+    
+    private func showSuggestion(_ suggestion: String) {
+        
     }
     
     // MARK: - Alert
@@ -117,7 +156,7 @@ class RouteSelectionViewController: UIViewController {
             self.view.layoutIfNeeded()
         }
     }
-
+    
 }
 
 // MARK: - UITextFieldDelegate

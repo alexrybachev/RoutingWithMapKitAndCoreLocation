@@ -102,8 +102,8 @@
 		282C2A31286B754400707B08 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				282C2A20286B74A400707B08 /* RouteSelectionViewController.swift */,
 				282C2A34286B790300707B08 /* DirectionsViewController.swift */,
+				282C2A20286B74A400707B08 /* RouteSelectionViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";

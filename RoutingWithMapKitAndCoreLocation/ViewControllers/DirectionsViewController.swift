@@ -44,7 +44,7 @@ class DirectionsViewController: UIViewController {
         super.viewDidLoad()
         
         groupAndRequestDirections()
-
+        
         headerLabel.text = route.label
         
         tableView.dataSource = self

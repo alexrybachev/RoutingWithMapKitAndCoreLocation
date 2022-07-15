@@ -87,11 +87,25 @@ class RouteSelectionViewController: UIViewController {
     }
     
     private func hideSuggestionView(animated: Bool) {
+        suggestionContainerTopConstraint.constant = -1 * (suggestionContainerView.bounds.height + 1)
         
+        guard animated else {
+            view.layoutIfNeeded()
+            return
+        }
+        
+        UIView.animate(withDuration: defaultAnimationDuration) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     private func showSuggestion(_ suggestion: String) {
+        suggestionLabel.text = suggestion
+        suggestionContainerTopConstraint.constant = -4 // to hide the top conrners
         
+        UIView.animate(withDuration: defaultAnimationDuration) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     // MARK: - Alert
@@ -114,12 +128,7 @@ class RouteSelectionViewController: UIViewController {
         let gestureView = gesture.view
         let point = gesture.location(in: gestureView)
         
-        guard
-            let hitView = gestureView?.hitTest(point, with: nil),
-            hitView == gestureView
-        else {
-            return
-        }
+        guard let hitView = gestureView?.hitTest(point, with: nil), hitView == gestureView else { return }
         
         view.endEditing(true)
     }
@@ -150,13 +159,12 @@ class RouteSelectionViewController: UIViewController {
         
         let viewHeight = view.bounds.height - view.safeAreaInsets.bottom
         let visibleHeight = viewHeight - frame.origin.y
-        // TODO: - !!!!
+        keyboardAvoidingConstraints.constant = visibleHeight + 32
         
         UIView.animate(withDuration: defaultAnimationDuration) {
             self.view.layoutIfNeeded()
         }
     }
-    
 }
 
 // MARK: - UITextFieldDelegate

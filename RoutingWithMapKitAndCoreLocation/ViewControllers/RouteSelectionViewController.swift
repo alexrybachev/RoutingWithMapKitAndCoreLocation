@@ -25,6 +25,11 @@ class RouteSelectionViewController: UIViewController {
     @IBOutlet private var suggestionContainerTopConstraint: NSLayoutConstraint!
     
     private let defaultAnimationDuration: TimeInterval = 0.25
+    private let locationManager = CLLocationManager()
+    private var currentPlace: CLPlacemark?
+    private let completer = MKLocalSearchCompleter()
+    private var editingTextField: UITextField?
+    private var currentRegion: MKCoordinateRegion?
     
     // MARK: - View Life Cycle
     override func viewDidLoad() {
@@ -33,6 +38,8 @@ class RouteSelectionViewController: UIViewController {
         suggestionContainerView.addBorder()
         inputContainerView.addBorder()
         calculateButton.stylize()
+        
+        completer.delegate = self
         
         beginObserving()
         configureGestures()
@@ -83,11 +90,20 @@ class RouteSelectionViewController: UIViewController {
     }
     
     private func attemptLocationAccess() {
+        guard CLLocationManager.locationServicesEnabled() else { return }
         
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager.delegate = self
+        
+        if CLLocationManager.authorizationStatus() == .notDetermined {
+            locationManager.requestWhenInUseAuthorization()
+        } else {
+            locationManager.requestLocation()
+        }
     }
     
     private func hideSuggestionView(animated: Bool) {
-        suggestionContainerTopConstraint.constant = -1 * (suggestionContainerView.bounds.height + 1)
+//        suggestionContainerTopConstraint.constant = -1 * (suggestionContainerView.bounds.height + 1)
         
         guard animated else {
             view.layoutIfNeeded()
@@ -101,7 +117,7 @@ class RouteSelectionViewController: UIViewController {
     
     private func showSuggestion(_ suggestion: String) {
         suggestionLabel.text = suggestion
-        suggestionContainerTopConstraint.constant = -4 // to hide the top conrners
+//        suggestionContainerTopConstraint.constant = -4 // to hide the top conrners
         
         UIView.animate(withDuration: defaultAnimationDuration) {
             self.view.layoutIfNeeded()
@@ -121,7 +137,21 @@ class RouteSelectionViewController: UIViewController {
     // MARK: - Actions
     
     @objc private func textFieldDidChange(_ textField: UITextField) {
+        if textField == originTextField && currentPlace != nil {
+            currentPlace = nil
+            textField.text = ""
+        }
         
+        guard let query = textField.contents else {
+            hideSuggestionView(animated: true)
+            
+            if completer.isSearching {
+                completer.cancel()
+            }
+            return
+        }
+        
+        completer.queryFragment = query
     }
     
     @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
@@ -159,7 +189,7 @@ class RouteSelectionViewController: UIViewController {
         
         let viewHeight = view.bounds.height - view.safeAreaInsets.bottom
         let visibleHeight = viewHeight - frame.origin.y
-        keyboardAvoidingConstraints.constant = visibleHeight + 32
+//        keyboardAvoidingConstraints.constant = visibleHeight + 32
         
         UIView.animate(withDuration: defaultAnimationDuration) {
             self.view.layoutIfNeeded()
@@ -181,11 +211,28 @@ extension RouteSelectionViewController: UITextFieldDelegate {
 extension RouteSelectionViewController: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        
+        guard status == .authorizedWhenInUse else { return }
+        manager.requestLocation()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let firstLocation = locations.first else { return }
         
+        // TODO: Configure MKLocalSearchCompleter here...
+        
+//        let commonDelta: CLLocationDegrees = 25 / 111
+//        let span = MKCoordinateSpan(latitudeDelta: commonDelta, longitudeDelta: commonDelta)
+//        let region = MKCoordinateRegion(center: firstLocation.coordinate, span: span)
+//
+//        currentPlace = region
+//        completer.region = region
+        
+        CLGeocoder().reverseGeocodeLocation(firstLocation) { places, _ in
+            guard let firstPlace = places?.first, self.originTextField.contents == nil else { return }
+            
+            self.currentPlace = firstPlace
+            self.originTextField.text = firstPlace.abbreviation
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -193,3 +240,17 @@ extension RouteSelectionViewController: CLLocationManagerDelegate {
     }
 }
 
+// MARK: - MKLocalSerchCompleterDelegate
+
+extension RouteSelectionViewController: MKLocalSearchCompleterDelegate {
+    
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        guard let firstResult = completer.results.first else { return }
+        
+        showSuggestion(firstResult.title)
+    }
+    
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        print("Error suggesting a location: \(error.localizedDescription)")
+    }
+}

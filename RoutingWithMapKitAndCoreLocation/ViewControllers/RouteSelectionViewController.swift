@@ -14,7 +14,7 @@ class RouteSelectionViewController: UIViewController {
     @IBOutlet private var inputContainerView: UIView!
     @IBOutlet private var originTextField: UITextField!
     @IBOutlet private var stopTextField: UITextField!
-    @IBOutlet private var extraTextField: UITextField!
+    @IBOutlet private var extraStopTextField: UITextField!
     
     @IBOutlet private var calculateButton: UIButton!
     @IBOutlet private var activityIndicatorView: UIActivityIndicatorView!
@@ -68,7 +68,7 @@ class RouteSelectionViewController: UIViewController {
     private func configureTextFields() {
         originTextField.delegate = self
         stopTextField.delegate = self
-        extraTextField.delegate = self
+        extraStopTextField.delegate = self
         
         originTextField.addTarget(
             self,
@@ -82,7 +82,7 @@ class RouteSelectionViewController: UIViewController {
             for: .editingChanged
         )
         
-        extraTextField.addTarget(
+        extraStopTextField.addTarget(
             self,
             action: #selector(textFieldDidChange),
             for: .editingChanged
@@ -173,7 +173,60 @@ class RouteSelectionViewController: UIViewController {
     // TODO: - !!!!
     
     @IBAction private func calculateButtonTapped() {
+        view.endEditing(true)
         
+        calculateButton.isEnabled = false
+        activityIndicatorView.startAnimating()
+        
+        let segment: RouteBuilder.Segment?
+        if let currentLocation = currentPlace?.location {
+            segment = .location(currentLocation)
+        } else if let originValue = originTextField.contents {
+            segment = .text(originValue)
+        } else {
+            segment = nil
+        }
+        
+        let stopSegments: [RouteBuilder.Segment] = [
+            stopTextField.contents,
+            extraStopTextField.contents
+        ].compactMap { contents in
+            if let value = contents {
+                return .text(value)
+            } else {
+                return nil
+            }
+        }
+        
+        guard let originSegment = segment, !stopSegments.isEmpty else {
+            presentAlert("Please select an origin and at least 1 stop.")
+            activityIndicatorView.stopAnimating()
+            calculateButton.isEnabled = true
+            return
+        }
+        
+        RouteBuilder.buildRoute(
+            origin: originSegment,
+            stops: stopSegments,
+            within: currentRegion) { result in
+                self.calculateButton.isEnabled = true
+                self.activityIndicatorView.stopAnimating()
+                
+                switch result {
+                case .success(let route):
+                    let viewController = DirectionsViewController(route: route)
+                    self.present(viewController, animated: true)
+                case .failure(let error):
+                    let errorMessage: String
+                    
+                    switch error {
+                    case .invalidSegment(let reason):
+                        errorMessage = "There was an error with: \(reason)."
+                    }
+                    
+                    self.presentAlert(errorMessage)
+                }
+            }
     }
     
     // MARK: - Notifications

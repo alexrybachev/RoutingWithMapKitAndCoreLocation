@@ -153,7 +153,7 @@
                     <connections>
                         <outlet property="activityIndicatorView" destination="Qed-7T-q6E" id="kBQ-rv-31T"/>
                         <outlet property="calculateButton" destination="39j-HU-bEd" id="yKg-wm-Exn"/>
-                        <outlet property="extraTextField" destination="JVr-DN-SYh" id="pIM-WB-nXh"/>
+                        <outlet property="extraStopTextField" destination="JVr-DN-SYh" id="pIM-WB-nXh"/>
                         <outlet property="inputContainerView" destination="1EV-LB-A9X" id="Mlc-N9-R2V"/>
                         <outlet property="keyboardAvoidingConstraints" destination="hiD-7L-Hdf" id="wZH-43-Y5Y"/>
                         <outlet property="originTextField" destination="zjN-J4-jVc" id="3qk-IK-hOi"/>

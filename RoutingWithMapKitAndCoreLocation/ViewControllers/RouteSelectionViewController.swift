@@ -218,14 +218,12 @@ extension RouteSelectionViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let firstLocation = locations.first else { return }
         
-        // TODO: Configure MKLocalSearchCompleter here...
-        
-//        let commonDelta: CLLocationDegrees = 25 / 111
-//        let span = MKCoordinateSpan(latitudeDelta: commonDelta, longitudeDelta: commonDelta)
-//        let region = MKCoordinateRegion(center: firstLocation.coordinate, span: span)
-//
-//        currentPlace = region
-//        completer.region = region
+        let commonDelta: CLLocationDegrees = 25 / 111
+        let span = MKCoordinateSpan(latitudeDelta: commonDelta, longitudeDelta: commonDelta)
+        let region = MKCoordinateRegion(center: firstLocation.coordinate, span: span)
+
+        currentRegion = region
+        completer.region = region
         
         CLGeocoder().reverseGeocodeLocation(firstLocation) { places, _ in
             guard let firstPlace = places?.first, self.originTextField.contents == nil else { return }

@@ -164,7 +164,10 @@ class RouteSelectionViewController: UIViewController {
     }
     
     @objc private func suggestionTapped(_ gesture: UITapGestureRecognizer) {
+        hideSuggestionView(animated: true)
         
+        editingTextField?.text = suggestionLabel.text
+        editingTextField = nil
     }
     
     // TODO: - !!!!
@@ -202,7 +205,13 @@ class RouteSelectionViewController: UIViewController {
 extension RouteSelectionViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
+        hideSuggestionView(animated: true)
         
+        if completer.isSearching {
+            completer.cancel()
+        }
+        
+        editingTextField = textField
     }
 }
 

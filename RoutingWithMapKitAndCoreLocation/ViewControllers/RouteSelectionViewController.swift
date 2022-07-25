@@ -34,6 +34,7 @@ class RouteSelectionViewController: UIViewController {
     // MARK: - View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .yellow
         
         suggestionContainerView.addBorder()
         inputContainerView.addBorder()
@@ -103,7 +104,7 @@ class RouteSelectionViewController: UIViewController {
     }
     
     private func hideSuggestionView(animated: Bool) {
-//        suggestionContainerTopConstraint.constant = -1 * (suggestionContainerView.bounds.height + 1)
+        suggestionContainerTopConstraint.constant = -1 * (suggestionContainerView.bounds.height + 1)
         
         guard animated else {
             view.layoutIfNeeded()
@@ -245,7 +246,7 @@ class RouteSelectionViewController: UIViewController {
         
         let viewHeight = view.bounds.height - view.safeAreaInsets.bottom
         let visibleHeight = viewHeight - frame.origin.y
-//        keyboardAvoidingConstraints.constant = visibleHeight + 32
+        keyboardAvoidingConstraints.constant = visibleHeight + 32
         
         UIView.animate(withDuration: defaultAnimationDuration) {
             self.view.layoutIfNeeded()

@@ -10,31 +10,29 @@ import MapKit
 import CoreLocation
 
 class RouteSelectionViewController: UIViewController {
-    
     @IBOutlet private var inputContainerView: UIView!
     @IBOutlet private var originTextField: UITextField!
     @IBOutlet private var stopTextField: UITextField!
     @IBOutlet private var extraStopTextField: UITextField!
-    
     @IBOutlet private var calculateButton: UIButton!
     @IBOutlet private var activityIndicatorView: UIActivityIndicatorView!
-    @IBOutlet private var keyboardAvoidingConstraints: NSLayoutConstraint!
+    @IBOutlet private var keyboardAvoidingConstraint: NSLayoutConstraint!
     
     @IBOutlet private var suggestionLabel: UILabel!
     @IBOutlet private var suggestionContainerView: UIView!
     @IBOutlet private var suggestionContainerTopConstraint: NSLayoutConstraint!
     
-    private let defaultAnimationDuration: TimeInterval = 0.25
-    private let locationManager = CLLocationManager()
-    private var currentPlace: CLPlacemark?
-    private let completer = MKLocalSearchCompleter()
     private var editingTextField: UITextField?
     private var currentRegion: MKCoordinateRegion?
+    private var currentPlace: CLPlacemark?
     
-    // MARK: - View Life Cycle
+    private let locationManager = CLLocationManager()
+    private let completer = MKLocalSearchCompleter()
+    
+    private let defaultAnimationDuration: TimeInterval = 0.25
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .yellow
         
         suggestionContainerView.addBorder()
         inputContainerView.addBorder()
@@ -55,13 +53,13 @@ class RouteSelectionViewController: UIViewController {
         view.addGestureRecognizer(
             UITapGestureRecognizer(
                 target: self,
-                action: #selector(handleTap)
+                action: #selector(handleTap(_:))
             )
         )
         suggestionContainerView.addGestureRecognizer(
-            UIGestureRecognizer(
+            UITapGestureRecognizer(
                 target: self,
-                action: #selector(suggestionTapped)
+                action: #selector(suggestionTapped(_:))
             )
         )
     }
@@ -73,25 +71,25 @@ class RouteSelectionViewController: UIViewController {
         
         originTextField.addTarget(
             self,
-            action: #selector(textFieldDidChange),
+            action: #selector(textFieldDidChange(_:)),
             for: .editingChanged
         )
-        
         stopTextField.addTarget(
             self,
-            action: #selector(textFieldDidChange),
+            action: #selector(textFieldDidChange(_:)),
             for: .editingChanged
         )
-        
         extraStopTextField.addTarget(
             self,
-            action: #selector(textFieldDidChange),
+            action: #selector(textFieldDidChange(_:)),
             for: .editingChanged
         )
     }
     
     private func attemptLocationAccess() {
-        guard CLLocationManager.locationServicesEnabled() else { return }
+        guard CLLocationManager.locationServicesEnabled() else {
+            return
+        }
         
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.delegate = self
@@ -118,32 +116,29 @@ class RouteSelectionViewController: UIViewController {
     
     private func showSuggestion(_ suggestion: String) {
         suggestionLabel.text = suggestion
-//        suggestionContainerTopConstraint.constant = -4 // to hide the top conrners
+        suggestionContainerTopConstraint.constant = -4 // to hide the top corners
         
         UIView.animate(withDuration: defaultAnimationDuration) {
             self.view.layoutIfNeeded()
         }
     }
     
-    // MARK: - Alert
-    
-    private func presentAlert(_ message: String) {
+    private func presentAlert(message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Okay", style: .default)
-        alertController.addAction(okAction)
+        alertController.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
         
         present(alertController, animated: true)
     }
     
     // MARK: - Actions
     
-    @objc private func textFieldDidChange(_ textField: UITextField) {
-        if textField == originTextField && currentPlace != nil {
+    @objc private func textFieldDidChange(_ field: UITextField) {
+        if field == originTextField && currentPlace != nil {
             currentPlace = nil
-            textField.text = ""
+            field.text = ""
         }
         
-        guard let query = textField.contents else {
+        guard let query = field.contents else {
             hideSuggestionView(animated: true)
             
             if completer.isSearching {
@@ -159,7 +154,12 @@ class RouteSelectionViewController: UIViewController {
         let gestureView = gesture.view
         let point = gesture.location(in: gestureView)
         
-        guard let hitView = gestureView?.hitTest(point, with: nil), hitView == gestureView else { return }
+        guard
+            let hitView = gestureView?.hitTest(point, with: nil),
+            hitView == gestureView
+        else {
+            return
+        }
         
         view.endEditing(true)
     }
@@ -170,8 +170,6 @@ class RouteSelectionViewController: UIViewController {
         editingTextField?.text = suggestionLabel.text
         editingTextField = nil
     }
-    
-    // TODO: - !!!!
     
     @IBAction private func calculateButtonTapped() {
         view.endEditing(true)
@@ -191,16 +189,20 @@ class RouteSelectionViewController: UIViewController {
         let stopSegments: [RouteBuilder.Segment] = [
             stopTextField.contents,
             extraStopTextField.contents
-        ].compactMap { contents in
-            if let value = contents {
-                return .text(value)
-            } else {
-                return nil
+        ]
+            .compactMap { contents in
+                if let value = contents {
+                    return .text(value)
+                } else {
+                    return nil
+                }
             }
-        }
         
-        guard let originSegment = segment, !stopSegments.isEmpty else {
-            presentAlert("Please select an origin and at least 1 stop.")
+        guard
+            let originSegment = segment,
+            !stopSegments.isEmpty
+        else {
+            presentAlert(message: "Please select an origin and at least 1 stop.")
             activityIndicatorView.stopAnimating()
             calculateButton.isEnabled = true
             return
@@ -209,25 +211,27 @@ class RouteSelectionViewController: UIViewController {
         RouteBuilder.buildRoute(
             origin: originSegment,
             stops: stopSegments,
-            within: currentRegion) { result in
-                self.calculateButton.isEnabled = true
-                self.activityIndicatorView.stopAnimating()
+            within: currentRegion
+        ) { result in
+            self.calculateButton.isEnabled = true
+            self.activityIndicatorView.stopAnimating()
+            
+            switch result {
+            case .success(let route):
+                let viewController = DirectionsViewController(route: route)
+                self.present(viewController, animated: true)
                 
-                switch result {
-                case .success(let route):
-                    let viewController = DirectionsViewController(route: route)
-                    self.present(viewController, animated: true)
-                case .failure(let error):
-                    let errorMessage: String
-                    
-                    switch error {
-                    case .invalidSegment(let reason):
-                        errorMessage = "There was an error with: \(reason)."
-                    }
-                    
-                    self.presentAlert(errorMessage)
+            case .failure(let error):
+                let errorMessage: String
+                
+                switch error {
+                case .invalidSegment(let reason):
+                    errorMessage = "There was an error with: \(reason)."
                 }
+                
+                self.presentAlert(message: errorMessage)
             }
+        }
     }
     
     // MARK: - Notifications
@@ -235,18 +239,20 @@ class RouteSelectionViewController: UIViewController {
     private func beginObserving() {
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(handleKeyboardFrameChange),
+            selector: #selector(handleKeyboardFrameChange(_:)),
             name: UIResponder.keyboardWillChangeFrameNotification,
             object: nil
         )
     }
     
     @objc private func handleKeyboardFrameChange(_ notification: Notification) {
-        guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        guard let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+            return
+        }
         
         let viewHeight = view.bounds.height - view.safeAreaInsets.bottom
         let visibleHeight = viewHeight - frame.origin.y
-        keyboardAvoidingConstraints.constant = visibleHeight + 32
+        keyboardAvoidingConstraint.constant = visibleHeight + 32
         
         UIView.animate(withDuration: defaultAnimationDuration) {
             self.view.layoutIfNeeded()
@@ -257,7 +263,6 @@ class RouteSelectionViewController: UIViewController {
 // MARK: - UITextFieldDelegate
 
 extension RouteSelectionViewController: UITextFieldDelegate {
-    
     func textFieldDidBeginEditing(_ textField: UITextField) {
         hideSuggestionView(animated: true)
         
@@ -272,24 +277,30 @@ extension RouteSelectionViewController: UITextFieldDelegate {
 // MARK: - CLLocationManagerDelegate
 
 extension RouteSelectionViewController: CLLocationManagerDelegate {
-    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        guard status == .authorizedWhenInUse else { return }
+        guard status == .authorizedWhenInUse else {
+            return
+        }
+        
         manager.requestLocation()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let firstLocation = locations.first else { return }
+        guard let firstLocation = locations.first else {
+            return
+        }
         
-        let commonDelta: CLLocationDegrees = 25 / 111
+        let commonDelta: CLLocationDegrees = 25 / 111 // 1/111 = 1 latitude km
         let span = MKCoordinateSpan(latitudeDelta: commonDelta, longitudeDelta: commonDelta)
         let region = MKCoordinateRegion(center: firstLocation.coordinate, span: span)
-
+        
         currentRegion = region
         completer.region = region
         
         CLGeocoder().reverseGeocodeLocation(firstLocation) { places, _ in
-            guard let firstPlace = places?.first, self.originTextField.contents == nil else { return }
+            guard let firstPlace = places?.first, self.originTextField.contents == nil else {
+                return
+            }
             
             self.currentPlace = firstPlace
             self.originTextField.text = firstPlace.abbreviation
@@ -301,12 +312,13 @@ extension RouteSelectionViewController: CLLocationManagerDelegate {
     }
 }
 
-// MARK: - MKLocalSerchCompleterDelegate
+// MARK: - MKLocalSearchCompleterDelegate
 
 extension RouteSelectionViewController: MKLocalSearchCompleterDelegate {
-    
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        guard let firstResult = completer.results.first else { return }
+        guard let firstResult = completer.results.first else {
+            return
+        }
         
         showSuggestion(firstResult.title)
     }

@@ -8,7 +8,6 @@
 import UIKit
 
 extension UITextField {
-    
     var contents: String? {
         guard
             let text = text?.trimmingCharacters(in: .whitespaces),
@@ -20,3 +19,4 @@ extension UITextField {
         return text
     }
 }
+

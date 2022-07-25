@@ -12,11 +12,11 @@ struct Route {
     let stops: [MKMapItem]
     
     var annotations: [MKAnnotation] {
-        
         var annotations: [MKAnnotation] = []
         
-        annotations.append(RouteAnnotation(item: origin))
-        
+        annotations.append(
+            RouteAnnotation(item: origin)
+        )
         annotations.append(contentsOf: stops.map { stop in
             return RouteAnnotation(item: stop)
         })

@@ -10,30 +10,169 @@ import MapKit
 import CoreLocation
 
 class RouteSelectionViewController: UIViewController {
-    @IBOutlet private var inputContainerView: UIView!
-    @IBOutlet private var originTextField: UITextField!
-    @IBOutlet private var stopTextField: UITextField!
-    @IBOutlet private var extraStopTextField: UITextField!
-    @IBOutlet private var calculateButton: UIButton!
-    @IBOutlet private var activityIndicatorView: UIActivityIndicatorView!
-    @IBOutlet private var keyboardAvoidingConstraint: NSLayoutConstraint!
     
-    @IBOutlet private var suggestionLabel: UILabel!
-    @IBOutlet private var suggestionContainerView: UIView!
-    @IBOutlet private var suggestionContainerTopConstraint: NSLayoutConstraint!
+    // MARK: - View and subviews
+    // title
+    private lazy var titleLabel: UILabel = {
+        let title = UILabel()
+        title.text = "RWRouter"
+        title.font = .boldSystemFont(ofSize: 38)
+        return title
+    }()
     
-    private var editingTextField: UITextField?
-    private var currentRegion: MKCoordinateRegion?
-    private var currentPlace: CLPlacemark?
+    // labels and textFields
+    private lazy var origintLabel: UILabel = {
+        let title = UILabel()
+        title.text = "Start / End"
+        title.font = .boldSystemFont(ofSize: 15)
+        return title
+    }()
     
-    private let locationManager = CLLocationManager()
-    private let completer = MKLocalSearchCompleter()
+    private lazy var stopLabel: UILabel = {
+        let title = UILabel()
+        title.text = "Stop"
+        title.font = .boldSystemFont(ofSize: 15)
+        return title
+    }()
     
-    private let defaultAnimationDuration: TimeInterval = 0.25
+    private lazy var extraStopLabel: UILabel = {
+        let title = UILabel()
+        title.text = "Extra Stop"
+        title.font = .boldSystemFont(ofSize: 15)
+        return title
+    }()
+    
+    private lazy var originTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Origin Address"
+        textField.font = .systemFont(ofSize: 14)
+        textField.borderStyle = .roundedRect
+        return textField
+    }()
+    
+    private lazy var stopTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Stop #1 Address"
+        textField.font = .systemFont(ofSize: 14)
+        textField.borderStyle = .roundedRect
+        return textField
+    }()
+    
+    private lazy var extraStopTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Stop #2 Address"
+        textField.font = .systemFont(ofSize: 14)
+        textField.borderStyle = .roundedRect
+        return textField
+    }()
+    
+    private lazy var menuStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [
+            origintLabel,
+            originTextField,
+            stopLabel,
+            stopTextField,
+            extraStopLabel,
+            extraStopTextField
+        ])
+        stack.axis = .vertical
+        stack.spacing = 8
+        return stack
+    }()
+    
+    private lazy var menuView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        view.layer.cornerRadius = 10
+        return view
+    }()
+    
+    // address suggection
+    private lazy var didYouMeanLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Did you mean:"
+        label.font = .systemFont(ofSize: 12)
+        return label
+    }()
+    
+    private lazy var suggestionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Address suggestion"
+        label.tintColor = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
+        label.font = .boldSystemFont(ofSize: 14)
+        return label
+    }()
+    
+    private lazy var suggestionStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [didYouMeanLabel, suggestionLabel])
+        stack.axis = .vertical
+        stack.spacing = 8
+        return stack
+    }()
+    
+    private lazy var suggestionContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        view.layer.cornerRadius = 10
+        return view
+    }()
+    
+    // calculate route and activityIndicator
+    private var calculateButton: UIButton = {
+        var configurator = UIButton.Configuration.plain()
+        configurator.baseBackgroundColor = .blue
+        configurator.attributedTitle?.font = .systemFont(ofSize: 15)
+        
+        let button = UIButton()
+        button.configuration = configurator
+        button.setTitle("Calculate Route", for: .normal)
+        return button
+    }()
+    
+    private var activityIndicatorView: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .medium
+        activityIndicator.color = .blue
+        return activityIndicator
+    }()
+    
+    private lazy var calculateStack: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [calculateButton, activityIndicatorView])
+        stackView.axis = .horizontal
+        stackView.spacing = 7
+        return stackView
+    }()
+    
+    
+    
+    
+//    @IBOutlet private var inputContainerView: UIView!
+//    @IBOutlet private var originTextField: UITextField!
+//    @IBOutlet private var stopTextField: UITextField!
+//    @IBOutlet private var extraStopTextField: UITextField!
+//    @IBOutlet private var calculateButton: UIButton!
+//    @IBOutlet private var activityIndicatorView: UIActivityIndicatorView!
+//    @IBOutlet private var keyboardAvoidingConstraint: NSLayoutConstraint!
+    
+//    @IBOutlet private var suggestionLabel: UILabel!
+//    @IBOutlet private var suggestionContainerView: UIView!
+//    @IBOutlet private var suggestionContainerTopConstraint: NSLayoutConstraint!
+    
+//    private var editingTextField: UITextField?
+//    private var currentRegion: MKCoordinateRegion?
+//    private var currentPlace: CLPlacemark?
+//
+//    private let locationManager = CLLocationManager()
+//    private let completer = MKLocalSearchCompleter()
+//
+//    private let defaultAnimationDuration: TimeInterval = 0.25
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
+        addSubviews()
         
+        /*
         suggestionContainerView.addBorder()
         inputContainerView.addBorder()
         calculateButton.stylize()
@@ -45,8 +184,59 @@ class RouteSelectionViewController: UIViewController {
         configureTextFields()
         attemptLocationAccess()
         hideSuggestionView(animated: false)
+         */
     }
     
+    // MARK: - Add subviews and constraints
+    private func addSubviews() {
+        view.addSubview(titleLabel)
+        view.addSubview(menuView)
+        
+        menuView.addSubview(menuStack)
+        suggestionContainerView.addSubview(suggestionStack)
+        
+        view.addSubview(suggestionContainerView)
+        view.addSubview(calculateStack)
+        
+        setConstraints()
+    }
+    
+    private func setConstraints() {
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: menuView.topAnchor, constant: -32).isActive = true
+        
+        menuView.translatesAutoresizingMaskIntoConstraints = false
+        menuView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32).isActive = true
+        menuView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32).isActive = true
+        menuView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0).isActive = true
+//        menuView.heightAnchor.constraint(equalToConstant: 390).isActive = true
+        
+        menuStack.translatesAutoresizingMaskIntoConstraints = false
+        menuStack.topAnchor.constraint(equalTo: menuView.topAnchor, constant: 24).isActive = true
+        menuStack.bottomAnchor.constraint(equalTo: menuView.bottomAnchor, constant: -24).isActive = true
+        menuStack.leadingAnchor.constraint(equalTo: menuView.leadingAnchor, constant: 16).isActive = true
+        menuStack.trailingAnchor.constraint(equalTo: menuView.trailingAnchor, constant: -16).isActive = true
+    
+        suggestionContainerView.translatesAutoresizingMaskIntoConstraints = false
+        suggestionContainerView.topAnchor.constraint(equalTo: menuView.bottomAnchor, constant: 0).isActive = true
+        suggestionContainerView.leadingAnchor.constraint(equalTo: menuView.leadingAnchor, constant: 32).isActive = true
+        suggestionContainerView.trailingAnchor.constraint(equalTo: menuView.trailingAnchor, constant: -32).isActive = true
+        
+        suggestionContainerView.addSubview(suggestionStack)
+        suggestionStack.translatesAutoresizingMaskIntoConstraints = false
+        suggestionStack.topAnchor.constraint(equalTo: suggestionContainerView.topAnchor, constant: 16).isActive = true
+        suggestionStack.bottomAnchor.constraint(equalTo: suggestionContainerView.bottomAnchor, constant: -16).isActive = true
+        suggestionStack.leadingAnchor.constraint(equalTo: suggestionContainerView.leadingAnchor, constant: 16).isActive = true
+        suggestionStack.trailingAnchor.constraint(equalTo: suggestionContainerView.trailingAnchor, constant: -16).isActive = true
+        
+        calculateStack.translatesAutoresizingMaskIntoConstraints = false
+        calculateStack.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        calculateStack.topAnchor.constraint(equalTo: suggestionContainerView.bottomAnchor, constant: 42).isActive = true
+        
+    }
+    
+    /*
     // MARK: - Helpers
     
     private func configureGestures() {
@@ -326,4 +516,7 @@ extension RouteSelectionViewController: MKLocalSearchCompleterDelegate {
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("Error suggesting a location: \(error.localizedDescription)")
     }
+}
+
+*/
 }

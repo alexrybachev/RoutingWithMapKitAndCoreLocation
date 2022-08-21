@@ -23,7 +23,6 @@
 		282C2A76287F48E300707B08 /* UIButton+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A75287F48E300707B08 /* UIButton+Additions.swift */; };
 		282C2A78287F48F400707B08 /* UIImage+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A77287F48F400707B08 /* UIImage+Additions.swift */; };
 		282C2A7A287F490500707B08 /* UIView+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282C2A79287F490500707B08 /* UIView+Additions.swift */; };
-		282C2A7C28847FE900707B08 /* DirectionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 282C2A7B28847FE900707B08 /* DirectionsViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,7 +44,6 @@
 		282C2A75287F48E300707B08 /* UIButton+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Additions.swift"; sourceTree = "<group>"; };
 		282C2A77287F48F400707B08 /* UIImage+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Additions.swift"; sourceTree = "<group>"; };
 		282C2A79287F490500707B08 /* UIView+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Additions.swift"; sourceTree = "<group>"; };
-		282C2A7B28847FE900707B08 /* DirectionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DirectionsViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,7 +102,6 @@
 			children = (
 				282C2A20286B74A400707B08 /* RouteSelectionViewController.swift */,
 				282C2A34286B790300707B08 /* DirectionsViewController.swift */,
-				282C2A7B28847FE900707B08 /* DirectionsViewController.xib */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -214,7 +211,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				282C2A7C28847FE900707B08 /* DirectionsViewController.xib in Resources */,
 				282C2A29286B74A500707B08 /* LaunchScreen.storyboard in Resources */,
 				282C2A26286B74A500707B08 /* Assets.xcassets in Resources */,
 			);

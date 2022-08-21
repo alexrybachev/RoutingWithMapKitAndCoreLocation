@@ -9,11 +9,64 @@ import UIKit
 import MapKit
 
 class DirectionsViewController: UIViewController {
-    @IBOutlet private var mapView: MKMapView!
-    @IBOutlet private var headerLabel: UILabel!
-    @IBOutlet private var tableView: UITableView!
-    @IBOutlet private var informationLabel: UILabel!
-    @IBOutlet private var activityIndicatorView: UIActivityIndicatorView!
+    
+    // mapView
+    private lazy var mapView: MKMapView = {
+        let mapView = MKMapView()
+        return mapView
+    }()
+    
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        return tableView
+    }()
+    
+    // directions info
+    private lazy var headerLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 2
+        label.text = "Directions"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.textAlignment = .left
+        return label
+    }()
+    
+    private lazy var activityIndicatorView: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView()
+        activityIndicator.style = .medium
+        return activityIndicator
+    }()
+    
+    private lazy var informationLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Calculating..."
+        label.textAlignment = .left
+        label.font = .systemFont(ofSize: 17)
+        return label
+    }()
+    
+    private lazy var calculatingStack:UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [activityIndicatorView, informationLabel])
+        stack.axis = .horizontal
+        stack.distribution = .fill
+        stack.spacing = 8
+        return stack
+    }()
+    
+    private lazy var directionsStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [headerLabel, calculatingStack])
+        stack.axis = .vertical
+        stack.spacing = 8
+        return stack
+    }()
+    
+    
+    
+//    @IBOutlet private var mapView: MKMapView!
+//    @IBOutlet private var headerLabel: UILabel!
+//    @IBOutlet private var tableView: UITableView!
+//    @IBOutlet private var informationLabel: UILabel!
+//    @IBOutlet private var activityIndicatorView: UIActivityIndicatorView!
     
     private let cellIdentifier = "DirectionsCell"
     private let distanceFormatter = MKDistanceFormatter()
@@ -28,8 +81,8 @@ class DirectionsViewController: UIViewController {
     
     init(route: Route) {
         self.route = route
-        
-        super.init(nibName: String(describing: DirectionsViewController.self), bundle: nil)
+        super.init()
+//        super.init(nibName: String(describing: DirectionsViewController.self), bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -39,7 +92,7 @@ class DirectionsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        groupAndRequestDirections()
+//        groupAndRequestDirections()
         
         headerLabel.text = route.label
         
@@ -49,8 +102,34 @@ class DirectionsViewController: UIViewController {
         mapView.showAnnotations(route.annotations, animated: false)
     }
     
-    // MARK: - Helpers
+    // MARK: - Subviews and constraints
+    private func addSubviews() {
+        view.addSubview(mapView)
+        view.addSubview(directionsStack)
+        view.addSubview(tableView)
+        setConstraints()
+    }
     
+    private func setConstraints() {
+        mapView.translatesAutoresizingMaskIntoConstraints = false
+        mapView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+        mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        
+        directionsStack.translatesAutoresizingMaskIntoConstraints = false
+        directionsStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        directionsStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        directionsStack.topAnchor.constraint(equalTo: mapView.bottomAnchor, constant: 20).isActive = true
+        directionsStack.bottomAnchor.constraint(equalTo: tableView.topAnchor, constant: -20).isActive = true
+        
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+        tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+    }
+    
+    // MARK: - Helpers
+   /*
     private func groupAndRequestDirections() {
         guard let firstStop = route.stops.first else {
             return
@@ -122,11 +201,13 @@ class DirectionsViewController: UIViewController {
         mapRoutes.append(mapRoute)
         tableView.reloadData()
     }
+    */
 }
-
+    
 // MARK: - UITableViewDataSource
 
 extension DirectionsViewController: UITableViewDataSource {
+    /*
     func numberOfSections(in tableView: UITableView) -> Int {
         return mapRoutes.isEmpty ? 0 : mapRoutes.count
     }
@@ -161,11 +242,13 @@ extension DirectionsViewController: UITableViewDataSource {
         let route = mapRoutes[section]
         return route.name
     }
+     */
 }
 
 // MARK: - MKMapViewDelegate
 
 extension DirectionsViewController: MKMapViewDelegate {
+    /*
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         let renderer = MKPolylineRenderer(overlay: overlay)
         
@@ -174,4 +257,5 @@ extension DirectionsViewController: MKMapViewDelegate {
         
         return renderer
     }
+    */
 }

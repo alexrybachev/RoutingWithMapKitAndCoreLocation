@@ -151,13 +151,13 @@ class RouteSelectionViewController: UIViewController {
     //    @IBOutlet private var suggestionContainerView: UIView!
     //    @IBOutlet private var suggestionContainerTopConstraint: NSLayoutConstraint!
     
-    //    private var editingTextField: UITextField?
-    //    private var currentRegion: MKCoordinateRegion?
-    //    private var currentPlace: CLPlacemark?
-    //
     private let locationManager = CLLocationManager()
-    //    private let completer = MKLocalSearchCompleter()
-    //
+    private var currentPlace: CLPlacemark?
+    private let completer = MKLocalSearchCompleter()
+    
+    private var editingTextField: UITextField?
+    private var currentRegion: MKCoordinateRegion?
+    
     private let defaultAnimationDuration: TimeInterval = 0.25
     
     override func viewDidLoad() {
@@ -174,13 +174,8 @@ class RouteSelectionViewController: UIViewController {
         configureTextFields()
         attemptLocationAccess()
         hideSuggestionView(animated: false)
-        /*
-         
-         completer.delegate = self
-         
-         */
-        /*
-         */
+        
+        completer.delegate = self
     }
     
     // MARK: - Add subviews and constraints
@@ -276,16 +271,16 @@ class RouteSelectionViewController: UIViewController {
     
     
     private func attemptLocationAccess() {
-        //        guard CLLocationManager.locationServicesEnabled() else { return }
-        //
-        //        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        //        locationManager.delegate = self
-        //
-        //        if CLLocationManager.authorizationStatus() == .notDetermined {
-        //            locationManager.requestWhenInUseAuthorization()
-        //        } else {
-        //            locationManager.requestLocation()
-        //        }
+        guard CLLocationManager.locationServicesEnabled() else { return }
+        
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager.delegate = self
+        
+        if CLLocationManager.authorizationStatus() == .notDetermined {
+            locationManager.requestWhenInUseAuthorization()
+        } else {
+            locationManager.requestLocation()
+        }
     }
     
     
@@ -319,24 +314,24 @@ class RouteSelectionViewController: UIViewController {
     }
     
     // MARK: - Actions
+    
     @objc private func textFieldDidChange(_ field: UITextField) {
-        /*
-         if field == originTextField && currentPlace != nil {
-         currentPlace = nil
-         field.text = ""
-         }
-         
-         guard let query = field.contents else {
-         hideSuggestionView(animated: true)
-         
-         if completer.isSearching {
-         completer.cancel()
-         }
-         return
-         }
-         
-         completer.queryFragment = query
-         */
+        
+        if field == originTextField && currentPlace != nil {
+            currentPlace = nil
+            field.text = ""
+        }
+        
+        guard let query = field.contents else {
+            hideSuggestionView(animated: true)
+            
+            if completer.isSearching {
+                completer.cancel()
+            }
+            return
+        }
+        
+        completer.queryFragment = query
     }
     
     @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
@@ -353,82 +348,75 @@ class RouteSelectionViewController: UIViewController {
         view.endEditing(true)
     }
     
-    
     @objc private func suggestionTapped(_ gesture: UITapGestureRecognizer) {
-        //        hideSuggestionView(animated: true)
-        //
-        //        editingTextField?.text = suggestionLabel.text
-        //        editingTextField = nil
+        hideSuggestionView(animated: true)
+        
+        editingTextField?.text = suggestionLabel.text
+        editingTextField = nil
     }
     
     @objc private func calculateButtonTapped() {
+        view.endEditing(true)
         
+        calculateButton.isEnabled = false
+        activityIndicatorView.startAnimating()
+        
+        let segment: RouteBuilder.Segment?
+        
+        if let currentLocation = currentPlace?.location {
+            segment = .location(currentLocation)
+        } else if let originValue = originTextField.contents {
+            segment = .text(originValue)
+        } else {
+            segment = nil
+        }
+        
+        let stopSegments: [RouteBuilder.Segment] = [
+            stopTextField.contents,
+            extraStopTextField.contents
+        ]
+            .compactMap { contents in
+                if let value = contents {
+                    return .text(value)
+                } else {
+                    return nil
+                }
+            }
+        
+        guard
+            let originSegment = segment,
+            !stopSegments.isEmpty
+        else {
+            presentAlert(message: "Please select an origin and at least 1 stop.")
+            activityIndicatorView.stopAnimating()
+            calculateButton.isEnabled = true
+            return
+        }
+        
+        RouteBuilder.buildRoute(
+            origin: originSegment,
+            stops: stopSegments,
+            within: currentRegion
+        ) { result in
+            self.calculateButton.isEnabled = true
+            self.activityIndicatorView.stopAnimating()
+            
+            switch result {
+            case .success(let route):
+                let viewController = DirectionsViewController(route: route)
+                self.present(viewController, animated: true)
+            case .failure(let error):
+                let errorMessage: String
+                
+                switch error {
+                case .invalidSegment(let reason):
+                    errorMessage = "There was an error with: \(reason)."
+                }
+                
+                self.presentAlert(message: errorMessage)
+            }
+        }
     }
-    
-    /*
-     @IBAction private func calculateButtonTapped() {
-     view.endEditing(true)
-     
-     calculateButton.isEnabled = false
-     activityIndicatorView.startAnimating()
-     
-     let segment: RouteBuilder.Segment?
-     if let currentLocation = currentPlace?.location {
-     segment = .location(currentLocation)
-     } else if let originValue = originTextField.contents {
-     segment = .text(originValue)
-     } else {
-     segment = nil
-     }
-     
-     let stopSegments: [RouteBuilder.Segment] = [
-     stopTextField.contents,
-     extraStopTextField.contents
-     ]
-     .compactMap { contents in
-     if let value = contents {
-     return .text(value)
-     } else {
-     return nil
-     }
-     }
-     
-     guard
-     let originSegment = segment,
-     !stopSegments.isEmpty
-     else {
-     presentAlert(message: "Please select an origin and at least 1 stop.")
-     activityIndicatorView.stopAnimating()
-     calculateButton.isEnabled = true
-     return
-     }
-     
-     RouteBuilder.buildRoute(
-     origin: originSegment,
-     stops: stopSegments,
-     within: currentRegion
-     ) { result in
-     self.calculateButton.isEnabled = true
-     self.activityIndicatorView.stopAnimating()
-     
-     switch result {
-     case .success(let route):
-     let viewController = DirectionsViewController(route: route)
-     self.present(viewController, animated: true)
-     
-     case .failure(let error):
-     let errorMessage: String
-     
-     switch error {
-     case .invalidSegment(let reason):
-     errorMessage = "There was an error with: \(reason)."
-     }
-     
-     self.presentAlert(message: errorMessage)
-     }
-     }
-     }
-     */
     
     // MARK: - Notifications
     
@@ -458,15 +446,13 @@ class RouteSelectionViewController: UIViewController {
 extension RouteSelectionViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        /*
-         hideSuggestionView(animated: true)
-         
-         if completer.isSearching {
-         completer.cancel()
-         }
-         
-         editingTextField = textField
-         */
+        hideSuggestionView(animated: true)
+        
+        if completer.isSearching {
+            completer.cancel()
+        }
+        
+        editingTextField = textField
     }
 }
 
@@ -480,27 +466,26 @@ extension RouteSelectionViewController: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        /*
-         guard let firstLocation = locations.first else {
-         return
-         }
-         
-         let commonDelta: CLLocationDegrees = 25 / 111 // 1/111 = 1 latitude km
-         let span = MKCoordinateSpan(latitudeDelta: commonDelta, longitudeDelta: commonDelta)
-         let region = MKCoordinateRegion(center: firstLocation.coordinate, span: span)
-         
-         currentRegion = region
-         completer.region = region
-         
-         CLGeocoder().reverseGeocodeLocation(firstLocation) { places, _ in
-         guard let firstPlace = places?.first, self.originTextField.contents == nil else {
-         return
-         }
-         
-         self.currentPlace = firstPlace
-         self.originTextField.text = firstPlace.abbreviation
-         }
-         */
+        guard let firstLocation = locations.first else { return }
+        
+        let commonDelta: CLLocationDegrees = 25 / 111 // 1/111 = 1 latitude km
+        let span = MKCoordinateSpan(latitudeDelta: commonDelta, longitudeDelta: commonDelta)
+        let region = MKCoordinateRegion(center: firstLocation.coordinate, span: span)
+        
+        currentRegion = region
+        completer.region = region
+        
+        CLGeocoder().reverseGeocodeLocation(firstLocation) { places, _ in
+            guard
+                let firstPlace = places?.first,
+                self.originTextField.contents == nil
+            else {
+                return
+            }
+            
+            self.currentPlace = firstPlace
+            self.originTextField.text = firstPlace.abbreviation
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
@@ -513,12 +498,10 @@ extension RouteSelectionViewController: CLLocationManagerDelegate {
 // MARK: - MKLocalSearchCompleterDelegate
 
 extension RouteSelectionViewController: MKLocalSearchCompleterDelegate {
+    
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        //        guard let firstResult = completer.results.first else {
-        //            return
-        //        }
-        //
-        //        showSuggestion(firstResult.title)
+        guard let firstResult = completer.results.first else { return }
+        showSuggestion(firstResult.title)
     }
     
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {

@@ -8,6 +8,7 @@
 import MapKit
 
 enum RouteBuilder {
+    
     enum Segment {
         case text(String)
         case location(CLLocation)
@@ -98,7 +99,6 @@ private extension CLGeocoder {
         switch segment {
         case .text(let value):
             geocodeAddressString(value, completionHandler: completionHandler)
-            
         case .location(let value):
             reverseGeocodeLocation(value, completionHandler: completionHandler)
         }

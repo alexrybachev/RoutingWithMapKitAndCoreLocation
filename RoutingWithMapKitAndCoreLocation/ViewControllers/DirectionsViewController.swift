@@ -61,7 +61,6 @@ class DirectionsViewController: UIViewController {
     }()
     
     
-    
 //    @IBOutlet private var mapView: MKMapView!
 //    @IBOutlet private var headerLabel: UILabel!
 //    @IBOutlet private var tableView: UITableView!
@@ -71,14 +70,15 @@ class DirectionsViewController: UIViewController {
     private let cellIdentifier = "DirectionsCell"
     private let distanceFormatter = MKDistanceFormatter()
     
-    private let route: Route
-    
     private var mapRoutes: [MKRoute] = []
     private var totalTravelTime: TimeInterval = 0
     private var totalDistance: CLLocationDistance = 0
     
-    private var groupedRoutes: [(startItem: MKMapItem, endItem: MKMapItem)] = []
+    private let route: Route
     
+//    private var groupedRoutes: [(startItem: MKMapItem, endItem: MKMapItem)] = []
+    
+    // MARK: - Initial
     init(route: Route) {
         self.route = route
         super.init()
@@ -89,16 +89,18 @@ class DirectionsViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    // MARK: - View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        groupAndRequestDirections()
+        groupAndRequestDirections()
         
         headerLabel.text = route.label
         
         tableView.dataSource = self
         
-        mapView.delegate = self
+//        mapView.delegate = self
         mapView.showAnnotations(route.annotations, animated: false)
     }
     
@@ -129,8 +131,8 @@ class DirectionsViewController: UIViewController {
     }
     
     // MARK: - Helpers
-   /*
     private func groupAndRequestDirections() {
+        /*
         guard let firstStop = route.stops.first else {
             return
         }
@@ -145,9 +147,11 @@ class DirectionsViewController: UIViewController {
         }
         
         fetchNextRoute()
+         */
     }
     
     private func fetchNextRoute() {
+        /*
         guard !groupedRoutes.isEmpty else {
             activityIndicatorView.stopAnimating()
             return
@@ -171,9 +175,11 @@ class DirectionsViewController: UIViewController {
             self.updateView(with: mapRoute)
             self.fetchNextRoute()
         }
+         */
     }
     
     private func updateView(with mapRoute: MKRoute) {
+        /*
         let padding: CGFloat = 8
         mapView.addOverlay(mapRoute.polyline)
         mapView.setVisibleMapRect(
@@ -200,8 +206,8 @@ class DirectionsViewController: UIViewController {
         
         mapRoutes.append(mapRoute)
         tableView.reloadData()
+         */
     }
-    */
 }
     
 // MARK: - UITableViewDataSource
@@ -218,6 +224,7 @@ extension DirectionsViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        /*
         let cell = { () -> UITableViewCell in
             guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) else {
                 let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
@@ -236,6 +243,8 @@ extension DirectionsViewController: UITableViewDataSource {
         )
         
         return cell
+         */
+        return UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

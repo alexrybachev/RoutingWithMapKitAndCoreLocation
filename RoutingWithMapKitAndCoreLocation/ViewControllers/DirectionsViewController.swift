@@ -207,7 +207,7 @@ class DirectionsViewController: UIViewController {
 // MARK: - UITableViewDataSource
 
 extension DirectionsViewController: UITableViewDataSource {
-    /*
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return mapRoutes.isEmpty ? 0 : mapRoutes.count
     }
@@ -242,7 +242,6 @@ extension DirectionsViewController: UITableViewDataSource {
         let route = mapRoutes[section]
         return route.name
     }
-     */
 }
 
 // MARK: - MKMapViewDelegate
